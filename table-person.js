@@ -1,7 +1,7 @@
 const sqlite3 = require("sqlite3");
 const dbFile = "my-project-db.sqlite3.db";
 db = new sqlite3.Database(dbFile);
-// creates table Person at startup
+// creates table Person at startup :)
 db.run(
   `CREATE TABLE Person (pid INTEGER PRIMARY KEY, fname TEXT NOT NULL, lname
 TEXT NOT NULL, age INTEGER, email TEXT)`,
