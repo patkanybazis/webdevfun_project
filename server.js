@@ -5,6 +5,24 @@ const sqlite3 = require("sqlite3");
 const dbFile = "my-project-db.sqlite3.db";
 const db = new sqlite3.Database(dbFile);
 const { engine } = require("express-handlebars");
+const bcrypt = require("bcrypt");
+const session = require("express-session");
+const connectSqlite3 = require("connect-sqlite3");
+
+//const adminPasswordHash =
+//"$2b$12$D8vMHr3ev5gFGG1Qf4JQMeow3GUG7ZmAfITlXqEIAgg.iiQPs.pDK";
+
+//STORE SESSIONS IN THE DATABASE
+const SqliteStore = connectSqlite3(session);
+//DEFINE THE SESSION
+app.use(
+  session({
+    store: new SqliteStore({ db: "sessions-db.db" }),
+    saveUninitialized: false,
+    resave: false,
+    secret: "This123Is@Another#456GreatSecret678%Sentence",
+  })
+);
 
 //HANDLEBARS
 app.engine("handlebars", engine());
@@ -14,10 +32,65 @@ app.set("views", "./views");
 //MIDDLEWARES
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+//make the session available in all handlebar files at once
+app.use((request, response, next) => {
+  response.locals.session = request.session;
+  next();
+});
 
 //------------------------------------------
 //USER FUNCTIONS
 //------------------------------------------
+
+//USERS TABLE
+function initTableUsers(mydb) {
+  //create table users at startup
+  mydb.run(
+    "CREATE TABLE users (uid INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, isAdmin INTEGER DEFAULT 0)",
+    (error) => {
+      if (error) {
+        console.log("ERROR creating users table: ", error);
+      } else {
+        console.log("---> Table users created");
+
+        //admin user with hashed password
+        const adminPasswordHash =
+          "$2b$12$D8vMHr3ev5gFGG1Qf4JQMeow3GUG7ZmAfITlXqEIAgg.iiQPs.pDK";
+
+        mydb.run(
+          "INSERT INTO users (username, password_hash, isAdmin) VALUES (?, ?, ?)",
+          ["admin", adminPasswordHash, 1],
+          (error) => {
+            if (error) {
+              console.log("ERROR inserting admin user: ", error);
+            } else {
+              console.log("Admin user added to users table!");
+            }
+          }
+        );
+
+        //regular user
+        bcrypt.hash("password", 12, (err, hash) => {
+          if (err) {
+            console.log("Error hashing user password");
+          } else {
+            mydb.run(
+              "INSERT INTO users (username, password_hash, isAdmin) VALUES (?, ?, ?)",
+              ["user", hash, 0],
+              (error) => {
+                if (error) {
+                  console.log("ERROR inserting regular user: ", error);
+                } else {
+                  console.log("Regular user added to users table!");
+                }
+              }
+            );
+          }
+        });
+      }
+    }
+  );
+}
 
 function initTableSkills(mydb) {
   // MODEL for skills
@@ -286,10 +359,12 @@ app.get("/skills", (req, res) => {
   });
 });
 
+//---LOGIN FORM
 app.get("/login", (req, res) => {
-  res.render("login.handlebars");
+  res.render("login");
 });
 
+/*--LOGIN PROCESSING
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
   //verification
@@ -297,10 +372,109 @@ app.post("/login", (req, res) => {
     return res.status(400).send("Username and password are required");
   }
   res.send(`Received: Username - ${username}, Password - ${password}`);
+})*/
+
+//--LOGIN PROCESSING
+app.post("/login", (request, response) => {
+  console.log(
+    `Here comes the data received from the form on the client: ${request.body.un} - ${request.body.pw}`
+  );
+  /* if (request.body.un === "admin") {
+    bcrypt.compare(request.body.pw, adminPasswordHash, (err, result) => {
+      if (err) {
+        console.log("Error in password comparison");
+        const model = { error: "Error in password comparison" }; //chatgpt helped add "const" to model
+        response.render("login", model);
+      } else if (result) {
+        request.session.isLoggedIn = true;
+        request.session.un = request.body.un;
+        request.session.isAdmin = true;
+        console.log(
+          "---> SESSION INFORMATION:",
+          JSON.stringify(request.session)
+        );
+        response.render("loggedin");
+      } else {
+        console.log("Wrong password");
+        const model = { error: "Wrong password! Please try again." };
+        response.render("login", model);
+      }
+    });
+  } else {
+    console.log("Wrong username");
+    const model = { error: "Wrong username! Please try again." };
+    response.render("login", model);
+  }*/
+
+  db.get(
+    "SELECT * FROM users WHERE username = ?",
+    [request.body.un],
+    (error, user) => {
+      if (error) {
+        console.log("Database error: ", error);
+        const model = { error: "Database error occurred" };
+        response.render("login", model);
+      } else if (!user) {
+        console.log("Wrong username");
+        const model = { error: "Wrong username! Please try again." };
+        response.render("login", model);
+      } else {
+        // User found, check password
+        bcrypt.compare(request.body.pw, user.password_hash, (err, result) => {
+          if (err) {
+            console.log("Error in password comparison");
+            const model = { error: "Error in password comparison" };
+            response.render("login", model);
+          } else if (result) {
+            // Password is correct
+            request.session.isLoggedIn = true;
+            request.session.un = user.username;
+            request.session.isAdmin = user.isAdmin === 1;
+            console.log(
+              "---> SESSION INFORMATION:",
+              JSON.stringify(request.session)
+            );
+            response.render("loggedin");
+          } else {
+            console.log("Wrong password");
+            const model = { error: "Wrong password! Please try again." };
+            response.render("login", model);
+          }
+        });
+      }
+    }
+  );
 });
 
+//Hash password
+function hashPassword(pw, saltRounds) {
+  bcrypt.hash(pw, saltRounds, function (err, hash) {
+    if (err) {
+      console.error("---> Error hashing password:", err);
+    } else {
+      console.log(`---> Hashed password: ${hash}`);
+    }
+  });
+}
+
+//--LOGOUT PROCESSING
+app.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.log("Error while destroying session:", err);
+      res.redirect("/");
+    } else {
+      console.log("Logged out...");
+      res.redirect("/");
+    }
+  });
+});
+
+//--LISTEN TO INCOMING REQUESTS
 app.listen(port, function () {
+  hashPassword("wdf#2025", 12);
   initTableSkills(db);
   initTableProjects(db);
+  initTableUsers(db);
   console.log(`Server up and running on http://localhost:${port}...`);
 });

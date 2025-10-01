@@ -13,6 +13,16 @@
           <li><a href="/projects">Projects</a></li>
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
+          <li><a href="/skills">Skills</a></li>
+
+          {{#if session.isLoggedIn}}
+            Hej,
+            {{session.un}}!
+            <a href="/logout">Logout</a>
+          {{else}}
+            <a href="/login">Login</a>
+          {{/if}}
+
         </ul>
       </nav>
     </header>

@@ -1,0 +1,9 @@
+<div id="principal">
+  <div class="mytextcard">
+    <h1>Welcome {{session.un}}!</h1>
+    <p>You are logged in successfully!</p>
+    {{#if session.isAdmin}}
+      <p><strong>You are an admin!</strong></p>
+    {{/if}}
+  </div>
+</div>
