@@ -1,0 +1,16 @@
+<div class="principal">
+
+  <h1>🎵 Music Library</h1>
+  <p>Browse through our extensive song collection.</p>
+
+  <div class="songs-list">
+    {{#each songs}}
+      <div class="song-item">
+        <h4>{{this.title}}</h4>
+        <p><strong>Duration:</strong> {{this.duration}}</p>
+        {{#if this.track_number}}<p><strong>Track:</strong>
+            #{{this.track_number}}</p>{{/if}}
+      </div>
+    {{/each}}
+  </div>
+</div>

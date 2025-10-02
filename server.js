@@ -91,135 +91,83 @@ function initTableUsers(mydb) {
     }
   );
 }
-
-function initTableSkills(mydb) {
-  // MODEL for skills
-  const skills = [
+// Artists table
+function initTableArtists(mydb) {
+  // MODEL for artists
+  const artists = [
     {
-      id: "1",
-      name: "PHP",
-      type: "Programming language",
-      desc: "Programming with PHP on the server side.",
-      level: 4,
+      id: 1,
+      name: "The Weeknd",
+      genre: "R&B",
+      country: "Canada",
+      formed_year: 2010,
+      bio: "Canadian singer, songwriter, and record producer known for his dark R&B style.",
+      image_url: "/img/theweeknd.jpg",
     },
     {
-      id: "2",
-      name: "Python",
-      type: "Programming language",
-      desc: "Programming with Python.",
-      level: 4,
+      id: 2,
+      name: "Melanie Martinez",
+      genre: "Alternative Pop",
+      country: "United States",
+      formed_year: 2012,
+      bio: "American singer-songwriter known for her conceptual albums and unique visual style.",
+      image_url: "/img/melanie.jpg",
     },
     {
-      id: "3",
-      name: "Java",
-      type: "Programming language",
-      desc: "Programming with Java.",
-      level: 2,
+      id: 3,
+      name: "Lana Del Rey",
+      genre: "Dream Pop",
+      country: "United States",
+      formed_year: 2011,
+      bio: "American singer-songwriter known for her cinematic style and nostalgic themes.",
+      image_url: "/img/lana.jpg",
     },
     {
-      id: "4",
-      name: "ImageJ",
-      type: "Framework",
-      desc: "Java Framework for Image Processing.",
-      level: 2,
+      id: 4,
+      name: "Teddy Swims",
+      genre: "Soul",
+      country: "United States",
+      formed_year: 2019,
+      bio: "American singer-songwriter blending R&B, soul, country, and pop music.",
+      image_url: "/img/teddy.jpg",
     },
     {
-      id: "5",
-      name: "Javascript",
-      type: "Programming language",
-      desc: "Programming with Javascript on the client side.",
-      level: 4,
-    },
-    {
-      id: "6",
-      name: "Node",
-      type: "Programming language",
-      desc: "Programming with Javascript on the server side.",
-      level: 4,
-    },
-    {
-      id: "7",
-      name: "Express",
-      type: "Framework",
-      desc: "A framework for programming Javascript on the server side.",
-      level: 4,
-    },
-    {
-      id: "8",
-      name: "Scikit-image",
-      type: "Library",
-      desc: "A library for Image Processing with Python.",
-      level: 3,
-    },
-    {
-      id: "9",
-      name: "OpenCV",
-      type: "Library",
-      desc: "A library for Image Processing with Python.",
-      level: 4,
-    },
-    {
-      id: "10",
-      name: "LaTeX",
-      type: "Description language",
-      desc: "A language to describe and build professional documents.",
-      level: 5,
-    },
-    {
-      id: "11",
-      name: "HTML",
-      type: "Description language",
-      desc: "A language to create web pages.",
-      level: 4,
-    },
-    {
-      id: "12",
-      name: "CSS",
-      type: "Description language",
-      desc: "A language to apply styles to web pages.",
-      level: 4,
-    },
-    {
-      id: "13",
-      name: "C",
-      type: "Programming language",
-      desc: "The historical language of the Linux/Unix kernels.",
-      level: 3,
-    },
-    {
-      id: "14",
-      name: "C++",
-      type: "Programming language",
-      desc: "A fast high level programming language.",
-      level: 1,
-    },
-    {
-      id: "15",
-      name: "SQL",
-      type: "Query language",
-      desc: "The relational database language to access data (CRUD).",
-      level: 4,
+      id: 5,
+      name: "Ariana Grande",
+      genre: "Pop",
+      country: "United States",
+      formed_year: 2011,
+      bio: "American singer and actress known for her four-octave vocal range.",
+      image_url: "/img/ariana.jpg",
     },
   ];
 
-  //create table skills at startup
+  //create table artists at startup
   mydb.run(
-    "CREATE TABLE skills (sid INTEGER PRIMARY KEY AUTOINCREMENT, sname TEXT NOT NULL, sdesc TEXT NOT NULL, stype TEXT NOT NULL, slevel INT)",
+    "CREATE TABLE artists (aid INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, genre TEXT NOT NULL, country TEXT NOT NULL, formed_year INTEGER, bio TEXT, image_url TEXT, created_by INTEGER, FOREIGN KEY(created_by) REFERENCES users(uid))",
     (error) => {
       if (error) {
-        console.log("ERROR: ", error);
+        console.log("ERROR creating artists table: ", error);
       } else {
-        console.log("---> Table projects created");
-        //inserts skills
-        skills.forEach((OneSkill) => {
+        console.log("---> Table artists created");
+        //insert artists
+        artists.forEach((oneArtist) => {
           db.run(
-            "INSERT INTO skills (sname, sdesc, stype, slevel) VALUES (?, ?, ?, ?)",
-            [OneSkill.name, OneSkill.desc, OneSkill.type, OneSkill.level],
+            "INSERT INTO artists (name, genre, country, formed_year, bio, image_url, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+              oneArtist.name,
+              oneArtist.genre,
+              oneArtist.country,
+              oneArtist.formed_year,
+              oneArtist.bio,
+              oneArtist.image_url,
+              1,
+            ], // created_by admin (uid=1)
             (error) => {
               if (error) {
                 console.log("ERROR: ", error);
               } else {
-                console.log("Line added into the skills table!");
+                console.log("Artist added to artists table!");
               }
             }
           );
@@ -229,92 +177,515 @@ function initTableSkills(mydb) {
   );
 }
 
-function initTableProjects(mydb) {
-  // MODEL //missing pictures
-  const projects = [
+//Album table
+function initTableAlbums(mydb) {
+  // MODEL for albums (2/artist)
+  const albums = [
+    // The Weeknd
     {
-      id: "1",
-      name: "Counting people with a camera",
-      type: "Research",
-      desc: "The purpose of this project is to count people passing through a corridor and to know how many are in the room at a certain time.",
-      year: 2022,
-      dev: "Python and OpenCV (Computer vision) library",
-      url: "/img/counting.png",
+      title: "After Hours",
+      release_year: 2020,
+      artist_id: 1,
+      cover_url: "/img/afterhours.jpg",
+      description: "Dark and introspective R&B album",
     },
     {
-      id: "2",
-      name: "Visualisation of 3D medical images",
-      type: "Research",
-      desc: "The project makes a 3D model of the analysis of the body of a person and displays the detected health problems. It is useful for doctors to view in 3D their patients and the evolution of a disease.",
-      year: 2012,
-      url: "/img/medical.png",
+      title: "Dawn FM",
+      release_year: 2022,
+      artist_id: 1,
+      cover_url: "/img/dawnfm.jpg",
+      description: "Conceptual album with 80s synth-pop influences",
+    },
+
+    // Melanie Martinez
+    {
+      title: "Cry Baby",
+      release_year: 2015,
+      artist_id: 2,
+      cover_url: "/img/crybaby.jpg",
+      description: "Debut album with dark nursery rhyme themes",
     },
     {
-      id: "3",
-      name: "Multiple questions system",
-      type: "Teaching",
-      desc: "During the lockdowns in France, this project was useful to test the students online with a Quizz system.",
-      year: 2021,
-      url: "/img/qcm07.png",
+      title: "K-12",
+      release_year: 2019,
+      artist_id: 2,
+      cover_url: "/img/k12.jpg",
+      description: "Concept album about school and growing up",
+    },
+
+    // Lana Del Rey
+    {
+      title: "Born to Die",
+      release_year: 2012,
+      artist_id: 3,
+      cover_url: "/img/borntodie.jpg",
+      description: "Debut studio album with cinematic pop sound",
     },
     {
-      id: "4",
-      name: "Image comparison with the Local Dissmilarity Map",
-      desc: "The project is about finding and quantifying the differences between two images of the same size. The applications were numerous: satellite imaging, medical imaging,...",
-      year: 2020,
-      type: "Research",
-      url: "/img/diaw02.png",
+      title: "Norman Fucking Rockwell!",
+      release_year: 2019,
+      artist_id: 3,
+      cover_url: "/img/nfr.jpg",
+      description: "Critically acclaimed album blending rock and pop",
+    },
+
+    // Teddy Swims
+    {
+      title: "Unlearning",
+      release_year: 2021,
+      artist_id: 4,
+      cover_url: "/img/unlearning.jpg",
+      description: "Debut EP showcasing soulful vocals",
     },
     {
-      id: "5",
-      name: "Management system for students' internships",
-      desc: "This project was about the creation of a database to manage the students' internships.",
-      year: 2012,
-      type: "Teaching",
-      url: "/img/management.png",
+      title: "Sleep Is For Dreamers",
+      release_year: 2022,
+      artist_id: 4,
+      cover_url: "/img/sleep.jpg",
+      description: "Full-length album mixing soul and pop",
+    },
+
+    // Ariana Grande
+    {
+      title: "Thank U, Next",
+      release_year: 2019,
+      artist_id: 5,
+      cover_url: "/img/thankunext.jpg",
+      description: "Pop album about growth and self-love",
     },
     {
-      id: "6",
-      name: "Magnetic Resonance Spectroscopy",
-      desc: "Analysis of signals and images from Magnetic Resonance Spectroscopy and Imaging.",
-      year: 2013,
-      type: "Research",
-      url: "/img/yu00.png",
-    },
-    {
-      id: "7",
-      name: "Signal Analysis for Detection of Epileptic Deseases",
-      desc: "This project was about the detection of epileptic problems in signals.",
-      year: 2019,
-      type: "research",
-      url: "/img/youssef00.png",
+      title: "Positions",
+      release_year: 2020,
+      artist_id: 5,
+      cover_url: "/img/positions.jpg",
+      description: "R&B influenced pop album",
     },
   ];
 
-  //create table projects at startup
+  //create table albums at startup
   mydb.run(
-    "CREATE TABLE projects (pid INTEGER PRIMARY KEY AUTOINCREMENT, pname TEXT NOT NULL, pyear INTEGER NOT NULL, pdesc TEXT NOT NULL, ptype TEXT NOT NULL, pImgURL TEXT NOT NULL)",
+    "CREATE TABLE albums (album_id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, release_year INTEGER, artist_id INTEGER NOT NULL, cover_url TEXT, description TEXT, created_by INTEGER, FOREIGN KEY(artist_id) REFERENCES artists(aid), FOREIGN KEY(created_by) REFERENCES users(uid))",
     (error) => {
       if (error) {
-        console.log("ERROR: ", error);
+        console.log("ERROR creating albums table: ", error);
       } else {
-        console.log("---> Table projects created");
-        //inserts projects
-        projects.forEach((OneProject) => {
+        console.log("---> Table albums created");
+        //insert albums
+        albums.forEach((oneAlbum) => {
           db.run(
-            "INSERT INTO projects (pname, pdesc, ptype, pyear, pImgURL) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO albums (title, release_year, artist_id, cover_url, description, created_by) VALUES (?, ?, ?, ?, ?, ?)",
             [
-              OneProject.name,
-              OneProject.desc,
-              OneProject.type,
-              OneProject.year,
-              OneProject.url,
+              oneAlbum.title,
+              oneAlbum.release_year,
+              oneAlbum.artist_id,
+              oneAlbum.cover_url,
+              oneAlbum.description,
+              1,
             ],
             (error) => {
               if (error) {
                 console.log("ERROR: ", error);
               } else {
-                console.log("Line added into the projects table!");
+                console.log("Album added to albums table!");
+              }
+            }
+          );
+        });
+      }
+    }
+  );
+}
+
+//Songs table
+function initTableSongs(mydb) {
+  // MODEL for songs (10 songs/artist)
+  const songs = [
+    // The Weeknd (artist_id: 1)
+    {
+      title: "Blinding Lights",
+      duration: "3:20",
+      artist_id: 1,
+      album_id: 1,
+      track_number: 2,
+    },
+    {
+      title: "Save Your Tears",
+      duration: "3:35",
+      artist_id: 1,
+      album_id: 1,
+      track_number: 5,
+    },
+    {
+      title: "After Hours",
+      duration: "6:01",
+      artist_id: 1,
+      album_id: 1,
+      track_number: 14,
+    },
+    {
+      title: "Heartless",
+      duration: "3:18",
+      artist_id: 1,
+      album_id: 1,
+      track_number: 1,
+    },
+    {
+      title: "In Your Eyes",
+      duration: "3:57",
+      artist_id: 1,
+      album_id: 1,
+      track_number: 8,
+    },
+    {
+      title: "Take My Breath",
+      duration: "3:40",
+      artist_id: 1,
+      album_id: 2,
+      track_number: 1,
+    },
+    {
+      title: "Sacrifice",
+      duration: "3:08",
+      artist_id: 1,
+      album_id: 2,
+      track_number: 4,
+    },
+    {
+      title: "Out of Time",
+      duration: "3:34",
+      artist_id: 1,
+      album_id: 2,
+      track_number: 6,
+    },
+    {
+      title: "Dawn FM",
+      duration: "1:29",
+      artist_id: 1,
+      album_id: 2,
+      track_number: 2,
+    },
+    {
+      title: "Gasoline",
+      duration: "3:32",
+      artist_id: 1,
+      album_id: 2,
+      track_number: 3,
+    },
+
+    // Melanie Martinez (artist_id: 2)
+    {
+      title: "Cry Baby",
+      duration: "3:35",
+      artist_id: 2,
+      album_id: 3,
+      track_number: 1,
+    },
+    {
+      title: "Dollhouse",
+      duration: "3:36",
+      artist_id: 2,
+      album_id: 3,
+      track_number: 2,
+    },
+    {
+      title: "Sippy Cup",
+      duration: "3:11",
+      artist_id: 2,
+      album_id: 3,
+      track_number: 3,
+    },
+    {
+      title: "Carousel",
+      duration: "3:30",
+      artist_id: 2,
+      album_id: 3,
+      track_number: 4,
+    },
+    {
+      title: "Pity Party",
+      duration: "3:09",
+      artist_id: 2,
+      album_id: 3,
+      track_number: 6,
+    },
+    {
+      title: "Wheels on the Bus",
+      duration: "3:14",
+      artist_id: 2,
+      album_id: 4,
+      track_number: 1,
+    },
+    {
+      title: "Class Fight",
+      duration: "3:05",
+      artist_id: 2,
+      album_id: 4,
+      track_number: 2,
+    },
+    {
+      title: "The Principal",
+      duration: "3:31",
+      artist_id: 2,
+      album_id: 4,
+      track_number: 3,
+    },
+    {
+      title: "Show & Tell",
+      duration: "3:17",
+      artist_id: 2,
+      album_id: 4,
+      track_number: 4,
+    },
+    {
+      title: "Nurse's Office",
+      duration: "3:38",
+      artist_id: 2,
+      album_id: 4,
+      track_number: 5,
+    },
+
+    // Lana Del Rey (artist_id: 3)
+    {
+      title: "Video Games",
+      duration: "4:41",
+      artist_id: 3,
+      album_id: 5,
+      track_number: 2,
+    },
+    {
+      title: "Born to Die",
+      duration: "4:46",
+      artist_id: 3,
+      album_id: 5,
+      track_number: 3,
+    },
+    {
+      title: "Blue Jeans",
+      duration: "3:29",
+      artist_id: 3,
+      album_id: 5,
+      track_number: 4,
+    },
+    {
+      title: "Summertime Sadness",
+      duration: "4:25",
+      artist_id: 3,
+      album_id: 5,
+      track_number: 6,
+    },
+    {
+      title: "National Anthem",
+      duration: "3:50",
+      artist_id: 3,
+      album_id: 5,
+      track_number: 7,
+    },
+    {
+      title: "Mariners Apartment Complex",
+      duration: "4:07",
+      artist_id: 3,
+      album_id: 6,
+      track_number: 1,
+    },
+    {
+      title: "Venice Bitch",
+      duration: "9:37",
+      artist_id: 3,
+      album_id: 6,
+      track_number: 2,
+    },
+    {
+      title: "Doin' Time",
+      duration: "3:21",
+      artist_id: 3,
+      album_id: 6,
+      track_number: 14,
+    },
+    {
+      title: "The Greatest",
+      duration: "5:01",
+      artist_id: 3,
+      album_id: 6,
+      track_number: 12,
+    },
+    {
+      title: "Fuck it I love you",
+      duration: "3:39",
+      artist_id: 3,
+      album_id: 6,
+      track_number: 13,
+    },
+
+    // Teddy Swims (artist_id: 4)
+    {
+      title: "Broke",
+      duration: "3:12",
+      artist_id: 4,
+      album_id: 7,
+      track_number: 1,
+    },
+    {
+      title: "Picky",
+      duration: "2:58",
+      artist_id: 4,
+      album_id: 7,
+      track_number: 2,
+    },
+    {
+      title: "911",
+      duration: "3:44",
+      artist_id: 4,
+      album_id: 7,
+      track_number: 3,
+    },
+    {
+      title: "Simple Things",
+      duration: "3:21",
+      artist_id: 4,
+      album_id: 7,
+      track_number: 4,
+    },
+    {
+      title: "My Bad",
+      duration: "3:15",
+      artist_id: 4,
+      album_id: 7,
+      track_number: 5,
+    },
+    {
+      title: "Bed on Fire",
+      duration: "3:33",
+      artist_id: 4,
+      album_id: 8,
+      track_number: 1,
+    },
+    {
+      title: "Stay",
+      duration: "3:18",
+      artist_id: 4,
+      album_id: 8,
+      track_number: 2,
+    },
+    {
+      title: "Lose Control",
+      duration: "3:45",
+      artist_id: 4,
+      album_id: 8,
+      track_number: 3,
+    },
+    {
+      title: "All of Me",
+      duration: "4:12",
+      artist_id: 4,
+      album_id: 8,
+      track_number: 4,
+    },
+    {
+      title: "Someone You Loved",
+      duration: "3:02",
+      artist_id: 4,
+      album_id: 8,
+      track_number: 5,
+    },
+
+    // Ariana Grande(artist_id: 5)
+    {
+      title: "thank u, next",
+      duration: "3:27",
+      artist_id: 5,
+      album_id: 9,
+      track_number: 1,
+    },
+    {
+      title: "7 rings",
+      duration: "2:58",
+      artist_id: 5,
+      album_id: 9,
+      track_number: 2,
+    },
+    {
+      title: "break up with your girlfriend, i'm bored",
+      duration: "3:10",
+      artist_id: 5,
+      album_id: 9,
+      track_number: 12,
+    },
+    {
+      title: "NASA",
+      duration: "3:02",
+      artist_id: 5,
+      album_id: 9,
+      track_number: 4,
+    },
+    {
+      title: "needy",
+      duration: "2:52",
+      artist_id: 5,
+      album_id: 9,
+      track_number: 7,
+    },
+    {
+      title: "positions",
+      duration: "2:52",
+      artist_id: 5,
+      album_id: 10,
+      track_number: 1,
+    },
+    {
+      title: "34+35",
+      duration: "2:54",
+      artist_id: 5,
+      album_id: 10,
+      track_number: 2,
+    },
+    {
+      title: "motive",
+      duration: "2:57",
+      artist_id: 5,
+      album_id: 10,
+      track_number: 3,
+    },
+    {
+      title: "just like magic",
+      duration: "2:31",
+      artist_id: 5,
+      album_id: 10,
+      track_number: 4,
+    },
+    {
+      title: "off the table",
+      duration: "4:01",
+      artist_id: 5,
+      album_id: 10,
+      track_number: 5,
+    },
+  ];
+
+  //create table songs at startup
+  mydb.run(
+    "CREATE TABLE songs (sid INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, duration TEXT NOT NULL, artist_id INTEGER NOT NULL, album_id INTEGER, track_number INTEGER, created_by INTEGER, FOREIGN KEY(artist_id) REFERENCES artists(aid), FOREIGN KEY(album_id) REFERENCES albums(album_id), FOREIGN KEY(created_by) REFERENCES users(uid))",
+    (error) => {
+      if (error) {
+        console.log("ERROR creating songs table: ", error);
+      } else {
+        console.log("---> Table songs created");
+        //insert songs
+        songs.forEach((oneSong) => {
+          db.run(
+            "INSERT INTO songs (title, duration, artist_id, album_id, track_number, created_by) VALUES (?, ?, ?, ?, ?, ?)",
+            [
+              oneSong.title,
+              oneSong.duration,
+              oneSong.artist_id,
+              oneSong.album_id,
+              oneSong.track_number,
+              1,
+            ],
+            (error) => {
+              if (error) {
+                console.log("ERROR: ", error);
+              } else {
+                console.log("Song added to songs table!");
               }
             }
           );
@@ -330,31 +701,48 @@ app.get("/", function (req, res) {
 });
 
 app.get("/about", (req, res) => {
-  res.render("cv.handlebars");
+  res.render("about.handlebars");
 });
 
 app.get("/contact", (req, res) => {
   res.render("contact.handlebars");
 });
 
-app.get("/projects", (req, res) => {
-  db.all("SELECT * FROM projects", function (error, projectsFromDB) {
-    if (error) {
-      console.log("ERROR: ", error);
-    } else {
-      const model = { projects: projectsFromDB };
-      res.render("projects.handlebars", model);
+app.get("/artists", (req, res) => {
+  db.all(
+    "SELECT * FROM artists ORDER BY name",
+    function (error, artistsFromDB) {
+      if (error) {
+        console.log("ERROR: ", error);
+      } else {
+        const model = { artists: artistsFromDB };
+        res.render("artists.handlebars", model);
+      }
     }
-  });
+  );
 });
 
-app.get("/skills", (req, res) => {
-  db.all("SELECT * FROM skills", function (error, listOfSkills) {
+app.get("/albums", (req, res) => {
+  db.all(
+    "SELECT * FROM albums ORDER BY release_year DESC",
+    function (error, albumsFromDB) {
+      if (error) {
+        console.log("ERROR: ", error);
+      } else {
+        const model = { albums: albumsFromDB };
+        res.render("albums.handlebars", model);
+      }
+    }
+  );
+});
+
+app.get("/songs", (req, res) => {
+  db.all("SELECT * FROM songs ORDER BY title", function (error, songsFromDB) {
     if (error) {
       console.log("ERROR: ", error);
     } else {
-      const model = { skills: listOfSkills };
-      res.render("skills.handlebars", model);
+      const model = { songs: songsFromDB };
+      res.render("songs.handlebars", model);
     }
   });
 });
@@ -446,7 +834,7 @@ app.post("/login", (request, response) => {
   );
 });
 
-//Hash password
+//--HASH PASSWORD
 function hashPassword(pw, saltRounds) {
   bcrypt.hash(pw, saltRounds, function (err, hash) {
     if (err) {
@@ -473,8 +861,9 @@ app.get("/logout", (req, res) => {
 //--LISTEN TO INCOMING REQUESTS
 app.listen(port, function () {
   hashPassword("wdf#2025", 12);
-  initTableSkills(db);
-  initTableProjects(db);
   initTableUsers(db);
+  initTableArtists(db);
+  initTableAlbums(db);
+  initTableSongs(db);
   console.log(`Server up and running on http://localhost:${port}...`);
 });

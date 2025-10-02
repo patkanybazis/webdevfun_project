@@ -1,0 +1,14 @@
+<div class="principal">
+  <h1>Music Albums</h1>
+  <p>Explore our collection of amazing albums.</p>
+
+  <div class="albums-grid">
+    {{#each albums}}
+      <div class="album-card">
+        <h3>{{this.title}}</h3>
+        <p><strong>Released:</strong> {{this.release_year}}</p>
+        <p>{{this.description}}</p>
+      </div>
+    {{/each}}
+  </div>
+</div>
