@@ -6,6 +6,7 @@
   <div class="songs-list">
     {{#each songs}}
       <div class="song-item">
+        <img src="{{this.cover_url}}" alt="album cover for {{this.title}}" />
         <h4>{{this.title}}</h4>
         <p><strong>Duration:</strong> {{this.duration}}</p>
         {{#if this.track_number}}<p><strong>Track:</strong>

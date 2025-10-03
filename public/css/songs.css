@@ -1,0 +1,39 @@
+.songs-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.song-item {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: white;
+}
+
+.song-item img {
+  width: 100%;
+  max-width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.song-item h4 {
+  font-size: 1.3rem;
+  margin: 0 0 10px 0;
+  color: white;
+}
+
+.song-item p {
+  font-size: 1rem;
+  margin: 8px 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}

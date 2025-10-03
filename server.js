@@ -31,6 +31,7 @@ app.set("views", "./views");
 
 //MIDDLEWARES
 app.use(express.static("public"));
+
 app.use(express.urlencoded({ extended: true }));
 //make the session available in all handlebar files at once
 app.use((request, response, next) => {
@@ -111,7 +112,7 @@ function initTableArtists(mydb) {
       country: "United States",
       formed_year: 2012,
       bio: "American singer-songwriter known for her conceptual albums and unique visual style.",
-      image_url: "/img/melanie.jpg",
+      image_url: "/img/melaniemartinez.jpg",
     },
     {
       id: 3,
@@ -120,7 +121,7 @@ function initTableArtists(mydb) {
       country: "United States",
       formed_year: 2011,
       bio: "American singer-songwriter known for her cinematic style and nostalgic themes.",
-      image_url: "/img/lana.jpg",
+      image_url: "/img/lanadelrey.jpeg",
     },
     {
       id: 4,
@@ -129,7 +130,7 @@ function initTableArtists(mydb) {
       country: "United States",
       formed_year: 2019,
       bio: "American singer-songwriter blending R&B, soul, country, and pop music.",
-      image_url: "/img/teddy.jpg",
+      image_url: "/img/teddyswims.jpeg",
     },
     {
       id: 5,
@@ -138,7 +139,7 @@ function initTableArtists(mydb) {
       country: "United States",
       formed_year: 2011,
       bio: "American singer and actress known for her four-octave vocal range.",
-      image_url: "/img/ariana.jpg",
+      image_url: "/img/arianagrande.jpg",
     },
   ];
 
@@ -186,14 +187,14 @@ function initTableAlbums(mydb) {
       title: "After Hours",
       release_year: 2020,
       artist_id: 1,
-      cover_url: "/img/afterhours.jpg",
+      cover_url: "/img/afterhours.png",
       description: "Dark and introspective R&B album",
     },
     {
       title: "Dawn FM",
       release_year: 2022,
       artist_id: 1,
-      cover_url: "/img/dawnfm.jpg",
+      cover_url: "/img/dawnfm.png",
       description: "Conceptual album with 80s synth-pop influences",
     },
 
@@ -202,7 +203,7 @@ function initTableAlbums(mydb) {
       title: "Cry Baby",
       release_year: 2015,
       artist_id: 2,
-      cover_url: "/img/crybaby.jpg",
+      cover_url: "/img/crybaby.png",
       description: "Debut album with dark nursery rhyme themes",
     },
     {
@@ -218,14 +219,14 @@ function initTableAlbums(mydb) {
       title: "Born to Die",
       release_year: 2012,
       artist_id: 3,
-      cover_url: "/img/borntodie.jpg",
+      cover_url: "/img/borntodie.png",
       description: "Debut studio album with cinematic pop sound",
     },
     {
       title: "Norman Fucking Rockwell!",
       release_year: 2019,
       artist_id: 3,
-      cover_url: "/img/nfr.jpg",
+      cover_url: "/img/rockwell.png",
       description: "Critically acclaimed album blending rock and pop",
     },
 
@@ -250,14 +251,14 @@ function initTableAlbums(mydb) {
       title: "Thank U, Next",
       release_year: 2019,
       artist_id: 5,
-      cover_url: "/img/thankunext.jpg",
+      cover_url: "/img/thankyounext.png",
       description: "Pop album about growth and self-love",
     },
     {
       title: "Positions",
       release_year: 2020,
       artist_id: 5,
-      cover_url: "/img/positions.jpg",
+      cover_url: "/img/positions.png",
       description: "R&B influenced pop album",
     },
   ];
@@ -737,14 +738,17 @@ app.get("/albums", (req, res) => {
 });
 
 app.get("/songs", (req, res) => {
-  db.all("SELECT * FROM songs ORDER BY title", function (error, songsFromDB) {
-    if (error) {
-      console.log("ERROR: ", error);
-    } else {
-      const model = { songs: songsFromDB };
-      res.render("songs.handlebars", model);
+  db.all(
+    "SELECT s.*, a.cover_url FROM songs s JOIN albums a ON s.album_id = a.album_id ORDER BY s.title",
+    function (error, songsFromDB) {
+      if (error) {
+        console.log("ERROR: ", error);
+      } else {
+        const model = { songs: songsFromDB };
+        res.render("songs.handlebars", model);
+      }
     }
-  });
+  );
 });
 
 //---LOGIN FORM

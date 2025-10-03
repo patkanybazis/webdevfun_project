@@ -5,6 +5,7 @@
   <div class="artists-grid">
     {{#each artists}}
       <div class="artist-card">
+        <img src="{{this.image_url}}" alt="Image of {{this.name}}" />
         <h3>{{this.name}}</h3>
         <p><strong>Genre:</strong> {{this.genre}}</p>
         <p><strong>Country:</strong> {{this.country}}</p>
