@@ -2,16 +2,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="stylesheet" href="/css/stylesheet.css" />
     <link rel="stylesheet" href="/css/albums.css" />
     <link rel="stylesheet" href="/css/songs.css" />
     <link rel="stylesheet" href="/css/artists.css" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Music Hub</title>
   </head>
   <body>
+
     <header>
-      <nav>
+      <nav aria-label="Primary">
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="/artists">Artists</a></li>
@@ -20,19 +36,32 @@
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
 
+          {{#if session.isAdmin}}
+            <li><a href="/admin/users">Users</a></li>
+          {{/if}}
+
           <li class="user-section">
             {{#if session.isLoggedIn}}
-              <span>Hej, {{session.un}}!</span>
-              <a href="/logout">Logout</a>
+              <span class="user-greeting">Hej, {{session.un}}!</span>
+              <a href="/logout" class="btn btn-auth btn-logout">Logout</a>
             {{else}}
-              <a href="/login">Login</a>
+              <a href="/login" class="btn btn-auth btn-login">Login</a>
             {{/if}}
           </li>
-
         </ul>
       </nav>
     </header>
 
-    {{{body}}}
+    {{! Global messages, shown anywhere you pass { error } or { success } }}
+    {{#if error}}
+      <div class="alert alert-error" role="alert">{{error}}</div>
+    {{/if}}
+    {{#if success}}
+      <div class="alert alert-success" role="status">{{success}}</div>
+    {{/if}}
+
+    <main id="content">
+      {{{body}}}
+    </main>
   </body>
 </html>

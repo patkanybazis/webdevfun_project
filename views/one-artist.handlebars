@@ -1,0 +1,30 @@
+<div class="artist-detail">
+  <h1>{{artist.name}}</h1>
+  <img
+    src="{{artist.image_url}}"
+    alt="Image of {{artist.name}}"
+    style="max-width:300px"
+  />
+  <p><strong>Genre:</strong> {{artist.genre}}</p>
+  <p><strong>Country:</strong> {{artist.country}}</p>
+  <p><strong>Active Since:</strong> {{artist.formed_year}}</p>
+  <p>{{artist.bio}}</p>
+
+  {{#if session.isAdmin}}
+    <div class="admin-tools">
+      <a href="/artists/modify/{{artist.aid}}">Modify</a>
+      <form
+        action="/artists/delete/{{artist.aid}}"
+        method="POST"
+        style="display:inline"
+      >
+        <button
+          type="submit"
+          onclick="return confirm('Delete {{artist.name}}?')"
+        >Delete</button>
+      </form>
+    </div>
+  {{/if}}
+
+  <p><a href="/artists">← Back to all artists</a></p>
+</div>

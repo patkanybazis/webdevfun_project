@@ -1,0 +1,13 @@
+.song-detail img {
+  display: block;
+  margin: 0.5rem 0 1rem 0;
+  border-radius: 8px;
+}
+.song-detail p {
+  margin: 0.25rem 0;
+}
+.admin-tools {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}

@@ -15,17 +15,34 @@ const connectSqlite3 = require("connect-sqlite3");
 //STORE SESSIONS IN THE DATABASE
 const SqliteStore = connectSqlite3(session);
 //DEFINE THE SESSION
+
 app.use(
   session({
     store: new SqliteStore({ db: "sessions-db.db" }),
     saveUninitialized: false,
     resave: false,
     secret: "This123Is@Another#456GreatSecret678%Sentence",
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    },
   })
 );
 
 //HANDLEBARS
-app.engine("handlebars", engine());
+app.engine(
+  "handlebars",
+  engine({
+    helpers: {
+      eq: (a, b) => a === b,
+      gt: (a, b) => a > b,
+      lt: (a, b) => a < b,
+      increment: (v) => Number(v) + 1,
+      decrement: (v) => Number(v) - 1,
+    },
+  })
+);
 app.set("view engine", "handlebars");
 app.set("views", "./views");
 
@@ -38,6 +55,21 @@ app.use((request, response, next) => {
   response.locals.session = request.session;
   next();
 });
+
+function requireLogin(req, res, next) {
+  if (req.session && req.session.isLoggedIn) return next();
+  return res
+    .status(403)
+    .render("home.handlebars", { error: "You must be logged in." });
+}
+
+function requireAdmin(req, res, next) {
+  if (req.session && req.session.isLoggedIn && req.session.isAdmin)
+    return next();
+  return res
+    .status(403)
+    .render("home.handlebars", { error: "Admin privileges required." });
+}
 
 //------------------------------------------
 //USER FUNCTIONS
@@ -92,7 +124,7 @@ function initTableUsers(mydb) {
     }
   );
 }
-// Artists table
+// ARTISTS TABLE
 function initTableArtists(mydb) {
   // MODEL for artists
   const artists = [
@@ -178,7 +210,7 @@ function initTableArtists(mydb) {
   );
 }
 
-//Album table
+// ALBUMS TABLE
 function initTableAlbums(mydb) {
   // MODEL for albums (2/artist)
   const albums = [
@@ -297,7 +329,7 @@ function initTableAlbums(mydb) {
   );
 }
 
-//Songs table
+//SONGS TABLE
 function initTableSongs(mydb) {
   // MODEL for songs (10 songs/artist)
   const songs = [
@@ -709,20 +741,6 @@ app.get("/contact", (req, res) => {
   res.render("contact.handlebars");
 });
 
-app.get("/artists", (req, res) => {
-  db.all(
-    "SELECT * FROM artists ORDER BY name",
-    function (error, artistsFromDB) {
-      if (error) {
-        console.log("ERROR: ", error);
-      } else {
-        const model = { artists: artistsFromDB };
-        res.render("artists.handlebars", model);
-      }
-    }
-  );
-});
-
 app.get("/albums", (req, res) => {
   db.all(
     "SELECT * FROM albums ORDER BY release_year DESC",
@@ -737,17 +755,317 @@ app.get("/albums", (req, res) => {
   );
 });
 
+// List songs with pagination and JOIN to show album cover
 app.get("/songs", (req, res) => {
-  db.all(
-    "SELECT s.*, a.cover_url FROM songs s JOIN albums a ON s.album_id = a.album_id ORDER BY s.title",
-    function (error, songsFromDB) {
-      if (error) {
-        console.log("ERROR: ", error);
-      } else {
-        const model = { songs: songsFromDB };
-        res.render("songs.handlebars", model);
-      }
+  const perPage = 10;
+  const page = Math.max(1, parseInt(req.query.page || "1", 10));
+
+  db.get("SELECT COUNT(*) AS c FROM songs", [], (err, row) => {
+    if (err)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Count failed" });
+
+    const total = row.c || 0;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    const offset = (page - 1) * perPage;
+
+    const sql = `
+      SELECT s.sid, s.title, s.duration, s.track_number,
+             a.album_id, a.title AS album_title, a.cover_url,
+             ar.aid AS artist_id, ar.name AS artist_name
+      FROM songs s
+      JOIN albums a ON s.album_id = a.album_id
+      JOIN artists ar ON s.artist_id = ar.aid
+      ORDER BY s.title
+      LIMIT ? OFFSET ?
+    `;
+    db.all(sql, [perPage, offset], (error, rows) => {
+      if (error)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Query failed" });
+      res.render("songs.handlebars", {
+        songs: rows,
+        pagination: { page, totalPages },
+      });
+    });
+  });
+});
+
+app.get("/artists/:aid", (req, res) => {
+  const artistId = req.params.aid;
+  db.get("SELECT * FROM artists WHERE aid = ?", [artistId], (err, artist) => {
+    if (err) return res.status(500).render("home", { error: "Database error" });
+    if (!artist) return res.status(404).render("404");
+    res.render("one-artist.handlebars", { artist });
+  });
+});
+
+app.get("/artists", (req, res) => {
+  db.all("SELECT * FROM artists ORDER BY name", [], (error, rows) => {
+    if (error) {
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Query failed" });
     }
+    res.render("artists.handlebars", { artists: rows });
+  });
+});
+
+// ---- SONGS CUD, ADMIN ONLY ----
+
+// create form, needs artists and albums for selects
+app.get("/songs/new", requireAdmin, (req, res) => {
+  db.all("SELECT aid, name FROM artists ORDER BY name", [], (e1, artists) => {
+    if (e1)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Artists load failed" });
+    db.all(
+      "SELECT album_id, title FROM albums ORDER BY title",
+      [],
+      (e2, albums) => {
+        if (e2)
+          return res
+            .status(500)
+            .render("home.handlebars", { error: "Albums load failed" });
+        res.render("song-form.handlebars", {
+          mode: "create",
+          song: {},
+          artists,
+          albums,
+        });
+      }
+    );
+  });
+});
+
+// create in DB
+app.post("/songs/create", requireAdmin, (req, res) => {
+  const { title, duration, artist_id, album_id, track_number } = req.body;
+  db.run(
+    "INSERT INTO songs (title, duration, artist_id, album_id, track_number, created_by) VALUES (?, ?, ?, ?, ?, ?)",
+    [title, duration, artist_id, album_id || null, track_number || null, 1],
+    (err) => {
+      if (err)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Insert failed" });
+      res.redirect("/songs");
+    }
+  );
+});
+
+// update form
+app.get("/songs/modify/:sid", requireAdmin, (req, res) => {
+  const sid = parseInt(req.params.sid, 10);
+  db.get("SELECT * FROM songs WHERE sid = ?", [sid], (e0, song) => {
+    if (e0)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Load failed" });
+    if (!song) return res.status(404).render("404.handlebars");
+    db.all("SELECT aid, name FROM artists ORDER BY name", [], (e1, artists) => {
+      if (e1)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Artists load failed" });
+      db.all(
+        "SELECT album_id, title FROM albums ORDER BY title",
+        [],
+        (e2, albums) => {
+          if (e2)
+            return res
+              .status(500)
+              .render("home.handlebars", { error: "Albums load failed" });
+          res.render("song-form.handlebars", {
+            mode: "update",
+            song,
+            artists,
+            albums,
+          });
+        }
+      );
+    });
+  });
+});
+
+// update in DB
+app.post("/songs/modify/:sid", requireAdmin, (req, res) => {
+  const { title, duration, artist_id, album_id, track_number } = req.body;
+  db.run(
+    "UPDATE songs SET title = ?, duration = ?, artist_id = ?, album_id = ?, track_number = ? WHERE sid = ?",
+    [
+      title,
+      duration,
+      artist_id,
+      album_id || null,
+      track_number || null,
+      req.params.sid,
+    ],
+    (err) => {
+      if (err)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Update failed" });
+      res.redirect("/songs");
+    }
+  );
+});
+
+// delete in DB
+app.post("/songs/delete/:sid", requireAdmin, (req, res) => {
+  db.run("DELETE FROM songs WHERE sid = ?", [req.params.sid], (err) => {
+    if (err)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Delete failed" });
+    res.redirect("/songs");
+  });
+});
+
+// One song detail with album and artist info
+app.get("/songs/:sid", (req, res) => {
+  const sid = parseInt(req.params.sid, 10);
+  if (!Number.isFinite(sid)) return res.status(400).render("404.handlebars");
+
+  const sql = `
+    SELECT s.*, a.title AS album_title, a.cover_url,
+           ar.name AS artist_name
+    FROM songs s
+    JOIN albums a ON s.album_id = a.album_id
+    JOIN artists ar ON s.artist_id = ar.aid
+    WHERE s.sid = ?
+  `;
+  db.get(sql, [sid], (err, song) => {
+    if (err)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Database error" });
+    if (!song) return res.status(404).render("404.handlebars");
+    res.render("one-song.handlebars", { song });
+  });
+});
+
+// ---- USERS ADMIN, ADMIN ONLY ----
+
+// list users
+app.get("/admin/users", requireAdmin, (req, res) => {
+  db.all(
+    "SELECT uid, username, isAdmin FROM users ORDER BY username",
+    [],
+    (err, users) => {
+      if (err)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Users query failed" });
+      res.render("users.handlebars", { users });
+    }
+  );
+});
+
+// show create user form
+app.get("/admin/users/new", requireAdmin, (req, res) => {
+  res.render("user-form.handlebars", { mode: "create", user: {} });
+});
+
+// create user, hash password
+app.post("/admin/users/create", requireAdmin, (req, res) => {
+  const { username, password } = req.body;
+  const isAdmin = req.body.isAdmin ? 1 : 0;
+
+  if (!username || !password) {
+    return res.status(400).render("user-form.handlebars", {
+      mode: "create",
+      user: {},
+      error: "Username and password are required.",
+    });
+  }
+
+  bcrypt.hash(password, 12, (err, hash) => {
+    if (err)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Hash failed" });
+    db.run(
+      "INSERT INTO users (username, password_hash, isAdmin) VALUES (?, ?, ?)",
+      [username, hash, isAdmin],
+      (e) =>
+        e
+          ? res
+              .status(500)
+              .render("home.handlebars", { error: "Insert user failed" })
+          : res.redirect("/admin/users")
+    );
+  });
+});
+
+// show edit user form
+app.get("/admin/users/modify/:uid", requireAdmin, (req, res) => {
+  db.get(
+    "SELECT uid, username, isAdmin FROM users WHERE uid = ?",
+    [req.params.uid],
+    (err, user) => {
+      if (err)
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Load user failed" });
+      if (!user) return res.status(404).render("404.handlebars");
+      res.render("user-form.handlebars", { mode: "update", user });
+    }
+  );
+});
+
+// update user, optional password change
+app.post("/admin/users/modify/:uid", requireAdmin, (req, res) => {
+  const { username, password } = req.body;
+  const isAdmin = req.body.isAdmin ? 1 : 0;
+
+  if (!username) {
+    return res.status(400).render("user-form.handlebars", {
+      mode: "update",
+      user: { uid: req.params.uid, username, isAdmin },
+      error: "Username is required.",
+    });
+  }
+
+  const doUpdate = (hash) => {
+    const sql = hash
+      ? "UPDATE users SET username = ?, isAdmin = ?, password_hash = ? WHERE uid = ?"
+      : "UPDATE users SET username = ?, isAdmin = ? WHERE uid = ?";
+    const params = hash
+      ? [username, isAdmin, hash, req.params.uid]
+      : [username, isAdmin, req.params.uid];
+
+    db.run(sql, params, (e) =>
+      e
+        ? res
+            .status(500)
+            .render("home.handlebars", { error: "Update user failed" })
+        : res.redirect("/admin/users")
+    );
+  };
+
+  if (password && password.trim().length > 0) {
+    bcrypt.hash(password, 12, (err, hash) =>
+      err
+        ? res.status(500).render("home.handlebars", { error: "Hash failed" })
+        : doUpdate(hash)
+    );
+  } else {
+    doUpdate(null);
+  }
+});
+
+// delete user
+app.post("/admin/users/delete/:uid", requireAdmin, (req, res) => {
+  db.run("DELETE FROM users WHERE uid = ?", [req.params.uid], (e) =>
+    e
+      ? res
+          .status(500)
+          .render("home.handlebars", { error: "Delete user failed" })
+      : res.redirect("/admin/users")
   );
 });
 
@@ -860,6 +1178,18 @@ app.get("/logout", (req, res) => {
       res.redirect("/");
     }
   });
+});
+
+//--404 ERROR HANDLING
+app.use((req, res) => {
+  res.status(404).render("404.handlebars");
+});
+
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res
+    .status(500)
+    .render("home.handlebars", { error: "Internal server error." });
 });
 
 //--LISTEN TO INCOMING REQUESTS

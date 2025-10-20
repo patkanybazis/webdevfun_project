@@ -1,6 +1,6 @@
 .artists-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   padding: 20px;
 }
@@ -10,7 +10,7 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 15px;
-  padding: 20px;
+  padding: 30px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   color: white;
@@ -18,8 +18,8 @@
 
 .artist-card img {
   width: 100%;
-  max-width: 250px;
-  height: 250px;
+  max-width: 200px;
+  height: 200px;
   object-fit: cover;
   border-radius: 50%;
   margin-bottom: 15px;
@@ -36,4 +36,14 @@
   margin: 8px 0;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+}
+
+.artist-card,
+.artist-card:link,
+.artist-card:visited,
+.artist-card:hover,
+.artist-card:active,
+.artist-card:focus {
+  text-decoration: none !important;
+  color: inherit;
 }

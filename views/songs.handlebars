@@ -1,17 +1,71 @@
 <div class="principal">
-
   <h1>🎵 Music Library</h1>
   <p>Browse through our extensive song collection.</p>
 
-  <div class="songs-list">
+  {{! CREATE SONG BUTTON }}
+  {{#if session.isAdmin}}
+    <p><a href="/songs/new" class="create-btn">+ Add New Song</a></p>
+  {{/if}}
+
+  {{! EMPTY STATE }}
+  {{#unless songs.length}}
+    <p>No songs found.</p>
+  {{/unless}}
+
+  <div class="songs-grid">
     {{#each songs}}
-      <div class="song-item">
-        <img src="{{this.cover_url}}" alt="album cover for {{this.title}}" />
-        <h4>{{this.title}}</h4>
-        <p><strong>Duration:</strong> {{this.duration}}</p>
-        {{#if this.track_number}}<p><strong>Track:</strong>
-            #{{this.track_number}}</p>{{/if}}
+      <div class="song-card">
+        <a href="/songs/{{sid}}">
+          {{#if cover_url}}
+            <img
+              src="{{cover_url}}"
+              alt="Album cover for {{title}}"
+              loading="lazy"
+            />
+          {{/if}}
+          <h4>{{title}}</h4>
+        </a>
+        <p><strong>Artist:</strong> {{artist_name}}</p>
+        <p><strong>Album:</strong> {{album_title}}</p>
+        <p><strong>Duration:</strong> {{duration}}</p>
+        {{#if track_number}}
+          <p><strong>Track:</strong> #{{track_number}}</p>
+        {{/if}}
+
+        {{! ADMIN TOOLS }}
+        {{#if @root.session.isAdmin}}
+          <div class="admin-tools">
+            <a href="/songs/modify/{{sid}}">Modify</a>
+            <form
+              action="/songs/delete/{{sid}}"
+              method="POST"
+              style="display:inline"
+            >
+              <button
+                type="submit"
+                onclick="return confirm('Delete {{title}}?')"
+              >Delete</button>
+            </form>
+          </div>
+        {{/if}}
       </div>
     {{/each}}
   </div>
+
+  {{! PAGINATION }}
+  <nav class="pager">
+    {{#if pagination}}
+      <div>
+        {{#if (gt pagination.page 1)}}
+          <a href="/songs?page={{decrement pagination.page}}">← Prev</a>
+        {{/if}}
+
+        <span>Page {{pagination.page}} of {{pagination.totalPages}}</span>
+
+        {{#if (lt pagination.page pagination.totalPages)}}
+          <a href="/songs?page={{increment pagination.page}}">Next →</a>
+        {{/if}}
+      </div>
+    {{/if}}
+  </nav>
 </div>

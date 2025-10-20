@@ -1,0 +1,62 @@
+<div class="principal">
+  <h1>{{#if (eq mode "create")}}Create User{{else}}Update User{{/if}}</h1>
+
+  {{#if error}}
+    <div class="alert alert-error" role="alert">{{error}}</div>
+  {{/if}}
+
+  <form
+    action="{{#if (eq mode 'create')}}/admin/users/create{{else}}/admin/users/modify/{{user.uid}}{{/if}}"
+    method="POST"
+    class="user-form"
+  >
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        name="username"
+        type="text"
+        value="{{user.username}}"
+        required
+        autocomplete="username"
+        placeholder="Enter username"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="password">
+        Password {{#if (eq mode "update")}}(leave blank to keep){{/if}}
+      </label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        {{#if (eq mode "create")}}required{{/if}}
+        autocomplete="{{#if (eq mode 'create')}}new-password{{else}}new-password{{/if}}"
+        placeholder="{{#if (eq mode 'create')}}Set a password{{else}}Leave empty to keep current{{/if}}"
+      >
+    </div>
+
+    <div class="form-group">
+     
+      <input type="hidden" name="isAdmin" value="0">
+      <label for="isAdmin" class="checkbox">
+        <input
+          id="isAdmin"
+          type="checkbox"
+          name="isAdmin"
+          value="1"
+          {{#if user.isAdmin}}checked{{/if}}
+        >
+        Admin
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">
+        {{#if (eq mode "create")}}Create User{{else}}Save Changes{{/if}}
+      </button>
+      <a href="/admin/users" class="cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>

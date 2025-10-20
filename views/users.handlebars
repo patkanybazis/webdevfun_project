@@ -1,0 +1,55 @@
+<div class="principal">
+  <h1>👤 User Management</h1>
+
+  {{! ERROR MESSAGE }}
+  {{#if error}}
+    <div class="alert alert-error" role="alert">{{error}}</div>
+  {{/if}}
+
+  {{! CREATE BUTTON }}
+  <p><a href="/admin/users/new" class="create-btn">+ Create New User</a></p>
+
+  {{! EMPTY STATE }}
+  {{#unless users.length}}
+    <p>No users found.</p>
+  {{/unless}}
+
+  {{! USERS TABLE }}
+  <table class="table users-table">
+    <thead>
+      <tr>
+        <th scope="col">UID</th>
+        <th scope="col">Username</th>
+        <th scope="col">Admin</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+        <tr>
+          <td>{{uid}}</td>
+          <td>{{username}}</td>
+          <td>{{#if isAdmin}}Yes{{else}}No{{/if}}</td>
+          <td>
+            <a href="/admin/users/modify/{{uid}}" class="btn-small">Modify</a>
+            <form
+              action="/admin/users/delete/{{uid}}"
+              method="POST"
+              style="display:inline"
+            >
+              <button
+                type="submit"
+                class="btn-small danger"
+                onclick="return confirm('Delete {{username}}?')"
+              >
+                Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <p><a href="/" class="back-link">← Back to Home</a></p>
+</div>

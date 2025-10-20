@@ -1,0 +1,84 @@
+<div class="principal">
+  <h1>
+    {{#if (eq mode "create")}}Create Song{{else}}Update Song{{/if}}
+  </h1>
+
+  <form 
+    action="{{#if (eq mode 'create')}}/songs/create{{else}}/songs/modify/{{song.sid}}{{/if}}" 
+    method="POST" 
+    class="song-form"
+  >
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        value="{{song.title}}" 
+        placeholder="Enter song title" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="duration">Duration</label>
+      <input 
+        type="text" 
+        id="duration" 
+        name="duration" 
+        value="{{song.duration}}" 
+        placeholder="e.g. 3:45" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="artist_id">Artist</label>
+      <select id="artist_id" name="artist_id" required>
+        <option value="">-- Select Artist --</option>
+        {{#each artists}}
+          <option 
+            value="{{this.aid}}" 
+            {{#if (eq ../song.artist_id this.aid)}}selected{{/if}}
+          >
+            {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="album_id">Album</label>
+      <select id="album_id" name="album_id">
+        <option value="">-- Select Album (optional) --</option>
+        {{#each albums}}
+          <option 
+            value="{{this.album_id}}" 
+            {{#if (eq ../song.album_id this.album_id)}}selected{{/if}}
+          >
+            {{this.title}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="track_number">Track Number</label>
+      <input 
+        type="number" 
+        id="track_number" 
+        name="track_number" 
+        min="1" 
+        value="{{song.track_number}}"
+        placeholder="e.g. 5"
+      >
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">
+        {{#if (eq mode "create")}}Create Song{{else}}Save Changes{{/if}}
+      </button>
+      <a href="/songs" class="cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>

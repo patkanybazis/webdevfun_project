@@ -1,5 +1,5 @@
 body {
-  background: linear-gradient(110deg, #900303, #120002);
+  background: linear-gradient(110deg, #ffccff, #b3d9ff, #bb99ff, #a64dff);
   min-height: 100vh;
   padding-top: 40px;
 }
@@ -35,8 +35,9 @@ nav ul li {
 nav ul li a {
   color: white;
   text-decoration: none;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Oswald", sans-serif;
   font-weight: 500;
+  font-style: normal;
   padding: 8px 15px;
   border-radius: 5px;
   transition: all 0.3s ease;
@@ -66,7 +67,14 @@ nav ul li a {
 
 /*-------------*/
 
-h1,
+h1 {
+  font-family: "BBH Sans Hegarty", sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  color: white;
+  margin: 20px;
+}
+
 h2,
 h3 {
   font-family: "Oswald", sans-serif;
@@ -106,6 +114,19 @@ ul {
   margin-left: 10px;
 }
 
-h1 {
-  margin: 20px;
+/* navbar login logout buttons */
+
+.btn,
+.btn-auth,
+.user-section a[href="/login"],
+.user-section a[href="/logout"] {
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.user-section .user-greeting {
+  font-family: "Oswald", sans-serif !important;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }

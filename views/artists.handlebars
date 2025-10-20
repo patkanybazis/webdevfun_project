@@ -1,17 +1,28 @@
 <div class="principal">
-  <h1> Our Artists</h1>
+  <h1>Our Artists</h1>
   <p>Discover amazing music from talented artists around the world.</p>
+
+  {{!-- Create button only to admin --}}
+  {{#if session.isAdmin}}
+    <p>
+      <a href="/artists/new" class="create-btn">+ Create artist</a>
+    </p>
+  {{/if}}
 
   <div class="artists-grid">
     {{#each artists}}
-      <div class="artist-card">
+      <a class="artist-card" href="/artists/{{this.aid}}">
         <img src="{{this.image_url}}" alt="Image of {{this.name}}" />
         <h3>{{this.name}}</h3>
         <p><strong>Genre:</strong> {{this.genre}}</p>
         <p><strong>Country:</strong> {{this.country}}</p>
         <p><strong>Active Since:</strong> {{this.formed_year}}</p>
         <p>{{this.bio}}</p>
-      </div>
+      </a>
     {{/each}}
   </div>
+
+
+</nav>
 </div>
+
