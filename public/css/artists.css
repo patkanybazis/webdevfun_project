@@ -1,49 +1,144 @@
-.artists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+
+.content-box {
+  max-width: 1500px; 
+  margin: 0 auto; 
+  margin-top: 60px;
+  border-radius: 12px;
   padding: 20px;
 }
 
+
+.principal h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  margin-top: 70px;
+}
+
+
+.create-btn {
+  display: inline-block;
+  text-decoration: none;
+  color: #555;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  background-color: #f9f9f9;
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+}
+
+.create-btn:hover {
+  background-color: #eee;
+}
+
+
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(220px, 1fr)
+  ); 
+  gap: 20px;
+  justify-content: center; 
+  max-width: 1200px; 
+  margin: 0 auto; /
+}
+
+
 .artist-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(10px);
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  padding: 30px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 15px;
   text-align: center;
   color: white;
+  text-decoration: none;
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
-
+.artist-card:hover {
+  transform: translateY(-6px); 
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+}
 .artist-card img {
   width: 100%;
-  max-width: 200px;
-  height: 200px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 50%;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
-
 .artist-card h3 {
-  font-size: 1.5rem;
-  margin: 0 0 10px 0;
+  margin-bottom: 6px;
+  font-size: 1.2rem;
   color: white;
 }
-
 .artist-card p {
-  font-size: 1rem;
-  margin: 8px 0;
+  font-size: 0.95rem;
+  margin: 4px 0;
   color: rgba(255, 255, 255, 0.9);
-  line-height: 1.4;
 }
 
-.artist-card,
-.artist-card:link,
-.artist-card:visited,
-.artist-card:hover,
-.artist-card:active,
-.artist-card:focus {
-  text-decoration: none !important;
-  color: inherit;
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 1200px) {
+  .artists-grid {
+    max-width: 1000px;
+  }
 }
+
+
+@media (max-width: 992px) {
+  .content-box {
+    margin-top: 40px;
+    padding: 18px;
+  }
+  .artists-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    max-width: 900px;
+  }
+  .artist-card {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .principal h1 {
+    font-size: 2rem;
+    margin-top: 50px;
+  }
+  .artists-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 95%;
+  }
+  .artist-card {
+    max-width: 200px;
+    padding: 12px;
+  }
+}
+
+
+@media (max-width: 520px) {
+  .content-box {
+    padding: 14px;
+  }
+  .artists-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .artist-card {
+    max-width: 170px;
+  }
+  .artist-card h3 {
+    font-size: 1.05rem;
+  }
+  .artist-card p {
+    font-size: 0.9rem;
+  }
+}
+
+

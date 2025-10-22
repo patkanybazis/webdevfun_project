@@ -1,55 +1,55 @@
 <div class="principal">
-  <h1>🎵 Music Library</h1>
-  <p>Browse through our extensive song collection.</p>
+  <h1 id="music-liby"> Music Library</h1>
 
-  {{! CREATE SONG BUTTON }}
-  {{#if session.isAdmin}}
-    <p><a href="/songs/new" class="create-btn">+ Add New Song</a></p>
-  {{/if}}
+  <div class="content-box">
+    {{! CREATE SONG BUTTON }}
+    {{#if session.isAdmin}}
+      <p><a href="/songs/new" class="create-btn">+ Add New Song</a></p>
+    {{/if}}
 
-  {{! EMPTY STATE }}
-  {{#unless songs.length}}
-    <p>No songs found.</p>
-  {{/unless}}
+    {{! EMPTY STATE }}
+    {{#unless songs.length}}
+      <p>No songs found.</p>
+    {{/unless}}
 
-  <div class="songs-grid">
-    {{#each songs}}
-      <div class="song-card">
-        <a href="/songs/{{sid}}">
-          {{#if cover_url}}
-            <img
-              src="{{cover_url}}"
-              alt="Album cover for {{title}}"
-              loading="lazy"
-            />
+    <div class="songs-grid">
+      {{#each songs}}
+        <div class="song-card">
+          <a href="/songs/{{sid}}">
+            {{#if cover_url}}
+              <img
+                src="{{cover_url}}"
+                alt="Album cover for {{title}}"
+                loading="lazy"
+              />
+            {{/if}}
+            <h4 class="song-title">{{title}}</h4>
+            <p class="song-person">{{artist_name}}</p>
+          </a>
+
+          {{! ADMIN TOOLS }}
+          {{#if @root.session.isAdmin}}
+            <div class="admin-tools">
+              <a href="/songs/modify/{{sid}}" class="admin-btn">Modify</a>
+              <form
+                action="/songs/delete/{{sid}}"
+                method="POST"
+                style="display:inline"
+              >
+                <button
+                  type="submit"
+                  class="admin-btn delete-btn"
+                  onclick="return confirm('Delete {{title}}?')"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
           {{/if}}
-          <h4>{{title}}</h4>
-        </a>
-        <p><strong>Artist:</strong> {{artist_name}}</p>
-        <p><strong>Album:</strong> {{album_title}}</p>
-        <p><strong>Duration:</strong> {{duration}}</p>
-        {{#if track_number}}
-          <p><strong>Track:</strong> #{{track_number}}</p>
-        {{/if}}
 
-        {{! ADMIN TOOLS }}
-        {{#if @root.session.isAdmin}}
-          <div class="admin-tools">
-            <a href="/songs/modify/{{sid}}">Modify</a>
-            <form
-              action="/songs/delete/{{sid}}"
-              method="POST"
-              style="display:inline"
-            >
-              <button
-                type="submit"
-                onclick="return confirm('Delete {{title}}?')"
-              >Delete</button>
-            </form>
-          </div>
-        {{/if}}
-      </div>
-    {{/each}}
+        </div>
+      {{/each}}
+    </div>
   </div>
 
   {{! PAGINATION }}

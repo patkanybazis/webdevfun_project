@@ -1,24 +1,24 @@
 <div class="principal">
-  <div class="mytextcard">
-    <h1>Login</h1>
+  <h1>Login</h1>
 
-    {{#if error}}
-      {{!chatgpt helped here}}
-      <div
-        style="color: red; margin-bottom: 10px; padding: 10px; border: 1px solid red; background-color: #ffe6e6;"
-      >
-        <strong>Error:</strong>
-        {{error}}
-      </div>
-    {{/if}}
+  {{#if error}}
+    <div class="error-box">
+      <strong>Error:</strong>
+      {{error}}
+    </div>
+  {{/if}}
 
-    <form action="/login" method="post">
+  <form action="/login" method="post">
+    <div class="form-row">
       <label for="username">Username:</label>
-      <input type="text" id="username" name="un" required /><br /><br />
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="pw" required /><br /><br />
+      <input type="text" id="username" name="un" required />
+    </div>
 
-      <input type="submit" value="Login" />
-    </form>
-  </div>
+    <div class="form-row">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="pw" required />
+    </div>
+
+    <input type="submit" value="Login" />
+  </form>
 </div>

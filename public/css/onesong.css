@@ -1,13 +1,119 @@
-.song-detail img {
-  display: block;
-  margin: 0.5rem 0 1rem 0;
-  border-radius: 8px;
-}
-.song-detail p {
-  margin: 0.25rem 0;
-}
-.admin-tools {
-  margin-top: 0.75rem;
+.song-detail-card {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 30px;
+
+  max-width: 550px;
+  margin: 60px auto;
+  padding: 30px;
+  color: white;
+
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.song-detail-img {
+  width: 280px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.song-info {
+  flex: 1;
+  font-family: "Open Sans", sans-serif;
+  font-size: 1rem;
+  text-align: left;
+}
+
+#songtitle {
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.song-info p {
+  margin: 8px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.principal p a {
+  color: white;
+  text-decoration: none;
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.principal p a:hover {
+  text-decoration: underline;
+  color: #ddd;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 992px) {
+  .song-detail-card {
+    gap: 20px;
+    max-width: 520px;
+    padding: 24px;
+    margin: 50px auto;
+  }
+  .song-detail-img {
+    width: 240px;
+  }
+  #songtitle {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .song-detail-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 520px;
+    gap: 16px;
+    padding: 20px;
+    margin: 44px auto;
+  }
+  .song-detail-img {
+    width: 70%;
+    max-width: 320px;
+    border-radius: 12px;
+  }
+  .song-info {
+    width: 100%;
+    text-align: left;
+    font-size: 0.98rem;
+  }
+  #songtitle {
+    text-align: center;
+    font-size: 1.7rem;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .song-detail-card {
+    max-width: 92%;
+    padding: 16px;
+    margin: 36px auto;
+    gap: 14px;
+  }
+  .song-detail-img {
+    width: 100%;
+    max-width: 280px;
+  }
+  .song-info {
+    font-size: 0.95rem;
+  }
+  #songtitle {
+    font-size: 1.5rem;
+  }
 }

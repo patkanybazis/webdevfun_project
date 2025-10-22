@@ -1,3 +1,26 @@
+/*
+
+Adrienn Rátonyi - raad23tt@student.ju.se
+
+Target grade: 5
+
+Project Web Dev Fun - 2025
+
+
+Admininistrator login: admin
+Administrator password: "wdf#2025" --->
+"$2b$12$D8vMHr3ev5gFGG1Qf4JQMeow3GUG7ZmAfITlXqEIAgg.iiQPs.pDK"
+
+Notes:
+
+Some code in this project were generated with the help of ChatGPT
+Several images come from the web: google images
+Pagination is on the songs page
+
+*/
+
+//--- LOAD THE PACKAGES
+
 const express = require("express");
 const port = 8080;
 const app = express();
@@ -9,11 +32,9 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const connectSqlite3 = require("connect-sqlite3");
 
-//const adminPasswordHash =
-//"$2b$12$D8vMHr3ev5gFGG1Qf4JQMeow3GUG7ZmAfITlXqEIAgg.iiQPs.pDK";
-
 //STORE SESSIONS IN THE DATABASE
 const SqliteStore = connectSqlite3(session);
+
 //DEFINE THE SESSION
 
 app.use(
@@ -50,7 +71,7 @@ app.set("views", "./views");
 app.use(express.static("public"));
 
 app.use(express.urlencoded({ extended: true }));
-//make the session available in all handlebar files at once
+//make the session available in all handlebars files at once
 app.use((request, response, next) => {
   response.locals.session = request.session;
   next();
@@ -124,6 +145,11 @@ function initTableUsers(mydb) {
     }
   );
 }
+
+//------------------------------------------
+//TABLES
+//------------------------------------------
+
 // ARTISTS TABLE
 function initTableArtists(mydb) {
   // MODEL for artists
@@ -185,9 +211,12 @@ function initTableArtists(mydb) {
         console.log("---> Table artists created");
         //insert artists
         artists.forEach((oneArtist) => {
-          db.run(
-            "INSERT INTO artists (name, genre, country, formed_year, bio, image_url, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          mydb.run(
+            `INSERT INTO artists
+      (aid, name, genre, country, formed_year, bio, image_url, created_by)
+     VALUES (?,   ?,    ?,     ?,       ?,           ?,   ?,         ?)`,
             [
+              oneArtist.id,
               oneArtist.name,
               oneArtist.genre,
               oneArtist.country,
@@ -195,13 +224,10 @@ function initTableArtists(mydb) {
               oneArtist.bio,
               oneArtist.image_url,
               1,
-            ], // created_by admin (uid=1)
+            ],
             (error) => {
-              if (error) {
-                console.log("ERROR: ", error);
-              } else {
-                console.log("Artist added to artists table!");
-              }
+              if (error) console.log("ERROR inserting artist:", error);
+              else console.log("Artist added:", oneArtist.name);
             }
           );
         });
@@ -216,6 +242,7 @@ function initTableAlbums(mydb) {
   const albums = [
     // The Weeknd
     {
+      album_id: 1,
       title: "After Hours",
       release_year: 2020,
       artist_id: 1,
@@ -223,6 +250,7 @@ function initTableAlbums(mydb) {
       description: "Dark and introspective R&B album",
     },
     {
+      album_id: 2,
       title: "Dawn FM",
       release_year: 2022,
       artist_id: 1,
@@ -232,6 +260,7 @@ function initTableAlbums(mydb) {
 
     // Melanie Martinez
     {
+      album_id: 3,
       title: "Cry Baby",
       release_year: 2015,
       artist_id: 2,
@@ -239,6 +268,7 @@ function initTableAlbums(mydb) {
       description: "Debut album with dark nursery rhyme themes",
     },
     {
+      album_id: 4,
       title: "K-12",
       release_year: 2019,
       artist_id: 2,
@@ -248,6 +278,7 @@ function initTableAlbums(mydb) {
 
     // Lana Del Rey
     {
+      album_id: 5,
       title: "Born to Die",
       release_year: 2012,
       artist_id: 3,
@@ -255,6 +286,7 @@ function initTableAlbums(mydb) {
       description: "Debut studio album with cinematic pop sound",
     },
     {
+      album_id: 6,
       title: "Norman Fucking Rockwell!",
       release_year: 2019,
       artist_id: 3,
@@ -264,6 +296,7 @@ function initTableAlbums(mydb) {
 
     // Teddy Swims
     {
+      album_id: 7,
       title: "Unlearning",
       release_year: 2021,
       artist_id: 4,
@@ -271,6 +304,7 @@ function initTableAlbums(mydb) {
       description: "Debut EP showcasing soulful vocals",
     },
     {
+      album_id: 8,
       title: "Sleep Is For Dreamers",
       release_year: 2022,
       artist_id: 4,
@@ -280,6 +314,7 @@ function initTableAlbums(mydb) {
 
     // Ariana Grande
     {
+      album_id: 9,
       title: "Thank U, Next",
       release_year: 2019,
       artist_id: 5,
@@ -287,6 +322,7 @@ function initTableAlbums(mydb) {
       description: "Pop album about growth and self-love",
     },
     {
+      album_id: 10,
       title: "Positions",
       release_year: 2020,
       artist_id: 5,
@@ -305,9 +341,12 @@ function initTableAlbums(mydb) {
         console.log("---> Table albums created");
         //insert albums
         albums.forEach((oneAlbum) => {
-          db.run(
-            "INSERT INTO albums (title, release_year, artist_id, cover_url, description, created_by) VALUES (?, ?, ?, ?, ?, ?)",
+          mydb.run(
+            `INSERT INTO albums
+      (album_id, title, release_year, artist_id, cover_url, description, created_by)
+     VALUES (?,         ?,     ?,           ?,         ?,         ?,          ?)`,
             [
+              oneAlbum.album_id, // <- explicit id so songs FK match
               oneAlbum.title,
               oneAlbum.release_year,
               oneAlbum.artist_id,
@@ -316,11 +355,8 @@ function initTableAlbums(mydb) {
               1,
             ],
             (error) => {
-              if (error) {
-                console.log("ERROR: ", error);
-              } else {
-                console.log("Album added to albums table!");
-              }
+              if (error) console.log("ERROR inserting album:", error);
+              else console.log("Album added:", oneAlbum.title);
             }
           );
         });
@@ -728,10 +764,59 @@ function initTableSongs(mydb) {
   );
 }
 
-app.get("/", function (req, res) {
-  //res.send("Hello World");
-  res.render("home.handlebars");
+//------------------------------------------
+//ROUTES
+//------------------------------------------
+
+app.get("/", (req, res) => {
+  // get 5 songs with album cover and artist name
+  const qSongs = `
+    SELECT s.sid, s.title, a.cover_url, ar.name AS artist_name
+    FROM songs s
+    JOIN albums a ON s.album_id = a.album_id
+    JOIN artists ar ON s.artist_id = ar.aid
+    ORDER BY RANDOM() LIMIT 5
+  `;
+
+  // get 5 artists
+  const qArtists = `
+    SELECT aid, name, genre, image_url
+    FROM artists
+    ORDER BY RANDOM() LIMIT 5
+  `;
+
+  // get 5 albums with artist name
+  const qAlbums = `
+    SELECT a.album_id, a.title, a.cover_url, ar.name AS artist_name
+    FROM albums a
+    JOIN artists ar ON a.artist_id = ar.aid
+    ORDER BY RANDOM() LIMIT 5
+  `;
+
+  db.all(qSongs, [], (e1, songs) => {
+    if (e1)
+      return res.render("home.handlebars", { error: "Could not load songs" });
+    db.all(qArtists, [], (e2, artists) => {
+      if (e2)
+        return res.render("home.handlebars", {
+          error: "Could not load artists",
+        });
+      db.all(qAlbums, [], (e3, albums) => {
+        if (e3)
+          return res.render("home.handlebars", {
+            error: "Could not load albums",
+          });
+        res.render("home.handlebars", {
+          popularSongs: songs,
+          popularArtists: artists,
+          popularAlbums: albums,
+        });
+      });
+    });
+  });
 });
+
+/*------------------*/
 
 app.get("/about", (req, res) => {
   res.render("about.handlebars");
@@ -742,17 +827,26 @@ app.get("/contact", (req, res) => {
 });
 
 app.get("/albums", (req, res) => {
-  db.all(
-    "SELECT * FROM albums ORDER BY release_year DESC",
-    function (error, albumsFromDB) {
-      if (error) {
-        console.log("ERROR: ", error);
-      } else {
-        const model = { albums: albumsFromDB };
-        res.render("albums.handlebars", model);
-      }
-    }
-  );
+  const sql = `
+    SELECT 
+      a.album_id,
+      a.title,
+      a.cover_url,
+      a.release_year,
+      a.description,
+      a.artist_id,
+      ar.name AS artist_name
+    FROM albums a
+    LEFT JOIN artists ar ON ar.aid = a.artist_id
+    ORDER BY a.title COLLATE NOCASE
+  `;
+  db.all(sql, [], (err, albums) => {
+    if (err)
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Database error loading albums" });
+    res.render("albums.handlebars", { albums, session: req.session });
+  });
 });
 
 // List songs with pagination and JOIN to show album cover
@@ -815,7 +909,7 @@ app.get("/artists", (req, res) => {
 
 // ---- SONGS CUD, ADMIN ONLY ----
 
-// create form, needs artists and albums for selects
+// create form
 app.get("/songs/new", requireAdmin, (req, res) => {
   db.all("SELECT aid, name FROM artists ORDER BY name", [], (e1, artists) => {
     if (e1)
@@ -948,7 +1042,121 @@ app.get("/songs/:sid", (req, res) => {
   });
 });
 
-// ---- USERS ADMIN, ADMIN ONLY ----
+// ---- ALBUMS CUD, ADMIN ONLY ----
+
+// create form
+app.get("/albums/new", requireAdmin, (req, res) => {
+  db.all("SELECT aid, name FROM artists ORDER BY name", [], (e1, artists) => {
+    if (e1) {
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Artists load failed" });
+    }
+    // render empty album object for create mode
+    res.render("album-form.handlebars", {
+      mode: "create",
+      album: {},
+      artists,
+    });
+  });
+});
+
+// create in DB
+app.post("/albums/create", requireAdmin, (req, res) => {
+  const { title, artist_id, release_year, cover_url, description } = req.body;
+
+  db.run(
+    `INSERT INTO albums (title, artist_id, release_year, cover_url, description)
+     VALUES (?, ?, ?, ?, ?)`,
+    [
+      title,
+      artist_id,
+      release_year || null,
+      cover_url || null,
+      description || null,
+    ],
+    (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Insert failed" });
+      }
+      res.redirect("/albums");
+    }
+  );
+});
+
+// update form
+app.get("/albums/modify/:album_id", requireAdmin, (req, res) => {
+  const albumId = parseInt(req.params.album_id, 10);
+
+  db.get("SELECT * FROM albums WHERE album_id = ?", [albumId], (e0, album) => {
+    if (e0) {
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Load failed" });
+    }
+    if (!album) return res.status(404).render("404.handlebars");
+
+    db.all("SELECT aid, name FROM artists ORDER BY name", [], (e1, artists) => {
+      if (e1) {
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Artists load failed" });
+      }
+
+      res.render("album-form.handlebars", {
+        mode: "update",
+        album,
+        artists,
+      });
+    });
+  });
+});
+
+//update in db
+app.post("/albums/modify/:album_id", requireAdmin, (req, res) => {
+  const albumId = parseInt(req.params.album_id, 10);
+  const { title, artist_id, release_year, cover_url, description } = req.body;
+
+  db.run(
+    `UPDATE albums
+       SET title = ?, artist_id = ?, release_year = ?, cover_url = ?, description = ?
+     WHERE album_id = ?`,
+    [
+      title,
+      artist_id,
+      release_year || null,
+      cover_url || null,
+      description || null,
+      albumId,
+    ],
+    (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .render("home.handlebars", { error: "Update failed" });
+      }
+      res.redirect("/albums");
+    }
+  );
+});
+
+//delete in db
+app.post("/albums/delete/:album_id", requireAdmin, (req, res) => {
+  const albumId = parseInt(req.params.album_id, 10);
+
+  db.run("DELETE FROM albums WHERE album_id = ?", [albumId], (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .render("home.handlebars", { error: "Delete failed" });
+    }
+    res.redirect("/albums");
+  });
+});
+
+// ---- USERS CUD, ADMIN ONLY----
 
 // list users
 app.get("/admin/users", requireAdmin, (req, res) => {
@@ -1074,47 +1282,11 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-/*--LOGIN PROCESSING
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  //verification
-  if (!username || !password) {
-    return res.status(400).send("Username and password are required");
-  }
-  res.send(`Received: Username - ${username}, Password - ${password}`);
-})*/
-
 //--LOGIN PROCESSING
 app.post("/login", (request, response) => {
   console.log(
     `Here comes the data received from the form on the client: ${request.body.un} - ${request.body.pw}`
   );
-  /* if (request.body.un === "admin") {
-    bcrypt.compare(request.body.pw, adminPasswordHash, (err, result) => {
-      if (err) {
-        console.log("Error in password comparison");
-        const model = { error: "Error in password comparison" }; //chatgpt helped add "const" to model
-        response.render("login", model);
-      } else if (result) {
-        request.session.isLoggedIn = true;
-        request.session.un = request.body.un;
-        request.session.isAdmin = true;
-        console.log(
-          "---> SESSION INFORMATION:",
-          JSON.stringify(request.session)
-        );
-        response.render("loggedin");
-      } else {
-        console.log("Wrong password");
-        const model = { error: "Wrong password! Please try again." };
-        response.render("login", model);
-      }
-    });
-  } else {
-    console.log("Wrong username");
-    const model = { error: "Wrong username! Please try again." };
-    response.render("login", model);
-  }*/
 
   db.get(
     "SELECT * FROM users WHERE username = ?",

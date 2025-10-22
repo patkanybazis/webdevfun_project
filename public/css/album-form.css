@@ -1,4 +1,4 @@
-.song-form {
+.album-form {
   max-width: 480px;
   margin: 0 auto;
   display: flex;
@@ -6,34 +6,36 @@
   gap: 1rem;
 }
 
-.song-form .form-group {
+.album-form .form-group {
   display: flex;
   flex-direction: column;
 }
 
-.song-form label {
-  font-weight: bold;
+.album-form label {
   margin-bottom: 0.3rem;
   color: #fff;
   font-family: "Oswald", sans-serif;
   font-weight: 500;
 }
 
-.song-form input,
-.song-form select {
+.album-form input,
+.album-form select,
+.album-form textarea {
   padding: 0.4rem;
   border: 1px solid #ccc;
   border-radius: 6px;
+  background: #fff;
+  color: #222;
 }
 
-.form-actions {
+.album-form .form-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 1rem;
 }
 
-.cancel-btn {
+.album-form .cancel-btn {
   text-decoration: none;
   color: #555;
   border: 1px solid #ccc;
@@ -43,12 +45,12 @@
   font-family: "Oswald", sans-serif;
   font-weight: 500;
 }
-
-.cancel-btn:hover {
+.album-form .cancel-btn:hover {
   background-color: #eee;
 }
 
-.create-song-button {
+.album-form .create-album-button,
+.album-form button[type="submit"] {
   text-decoration: none;
   color: #555;
   border: 1px solid #ccc;
@@ -57,8 +59,18 @@
   background-color: #f9f9f9;
   font-family: "Oswald", sans-serif;
   font-weight: 500;
+  cursor: pointer;
+}
+.album-form .create-album-button:hover,
+.album-form button[type="submit"]:hover {
+  background-color: #eee;
 }
 
-.create-song-button:hover {
-  background-color: #eee;
+.album-form .cover-preview {
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }

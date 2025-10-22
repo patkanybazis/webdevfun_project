@@ -1,0 +1,81 @@
+<div class="principal">
+  <h1>
+    {{#if (eq mode "create")}}Create Album{{else}}Update Album{{/if}}
+  </h1>
+
+  <form
+    action="{{#if (eq mode 'create')}}/albums/create{{else}}/albums/modify/{{album.album_id}}{{/if}}"
+    method="POST"
+    class="album-form"
+  >
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        value="{{album.title}}"
+        placeholder="Enter album title"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="artist_id">Artist</label>
+      <select id="artist_id" name="artist_id" required>
+        <option value="">-- Select Artist --</option>
+        {{#each artists}}
+          <option
+            value="{{this.aid}}"
+            {{#if (eq ../album.artist_id this.aid)}}selected{{/if}}
+          >
+            {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="release_year">Release Year</label>
+      <input
+        type="number"
+        id="release_year"
+        name="release_year"
+        min="1900"
+        max="2099"
+        step="1"
+        value="{{album.release_year}}"
+        placeholder="e.g. 2015"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="cover_url">Cover URL</label>
+      <input
+        type="url"
+        id="cover_url"
+        name="cover_url"
+        value="{{album.cover_url}}"
+        placeholder="https://example.com/cover.jpg"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="4"
+        placeholder="Optional short description"
+      >{{album.description}}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">
+        {{#if (eq mode "create")}}Create Album{{else}}Save Changes{{/if}}
+      </button>
+      <a href="/albums" class="cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>

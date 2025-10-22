@@ -1,16 +1,46 @@
 <div class="principal">
-  <h1>Music Albums</h1>
-  <p>Explore our collection of amazing albums.</p>
+  <h1 id="musicalbums">Music Albums</h1>
 
-  <div class="albums-grid">
-    {{#each albums}}
-      <div class="album-card">
-        <img src="{{this.cover_url}}" alt="album cover for {{this.title}}" />
-        <h2>{{this.title}}</h2>
-        <p><strong>Artist:</strong> {{this.artist_name}}</p>
-        <p><strong>Released:</strong> {{this.release_year}}</p>
-        <p>{{this.description}}</p>
-      </div>
-    {{/each}}
+  <div class="content-box">
+
+    {{! Create button only to admin }}
+    {{#if session.isAdmin}}
+      <p>
+        <a href="/albums/new" class="create-btn">+ Create album</a>
+      </p>
+    {{/if}}
+
+    <div class="albums-grid">
+      {{#each albums}}
+        <div class="album-card">
+          <img src="{{this.cover_url}}" alt="album cover for {{this.title}}" />
+          <h2>{{this.title}}</h2>
+          <p><strong>Artist:</strong> {{this.artist_name}}</p>
+          <p><strong>Released:</strong> {{this.release_year}}</p>
+          <p>{{this.description}}</p>
+
+          {{! ADMIN TOOLS }}
+          {{#if @root.session.isAdmin}}
+            <div class="admin-tools">
+              <a href="/albums/modify/{{album_id}}" class="admin-btn">Modify</a>
+
+              <form
+                action="/albums/delete/{{album_id}}"
+                method="POST"
+                style="display:inline"
+              >
+                <button
+                  type="submit"
+                  class="admin-btn delete-btn"
+                  onclick="return confirm('Delete {{title}}?')"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          {{/if}}
+        </div>
+      {{/each}}
+    </div>
   </div>
 </div>

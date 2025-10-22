@@ -1,39 +1,42 @@
 <div class="principal">
-  <div class="song-detail">
-    <h1>{{song.title}}</h1>
-
+  <h1>More about {{song.title}}</h1>
+  <div class="song-detail-card">
     {{#if song.cover_url}}
       <img
         src="{{song.cover_url}}"
-        alt="Album cover for {{song.album_title}}"
-        style="max-width:300px"
-        loading="lazy"
+        alt="Cover for {{song.title}}"
+        class="song-detail-img"
       />
     {{/if}}
 
-    <p><strong>Artist:</strong> {{song.artist_name}}</p>
-    {{#if song.album_title}}<p><strong>Album:</strong>
-        {{song.album_title}}</p>{{/if}}
-    <p><strong>Duration:</strong> {{song.duration}}</p>
-    {{#if song.track_number}}<p><strong>Track:</strong>
-        {{song.track_number}}</p>{{/if}}
-
-    {{#if @root.session.isAdmin}}
-      <div class="admin-tools">
-        <a href="/songs/modify/{{song.sid}}">Modify</a>
-        <form
-          action="/songs/delete/{{song.sid}}"
-          method="POST"
-          style="display:inline"
-        >
-          <button
-            type="submit"
-            onclick="return confirm('Delete {{song.title}}?')"
-          >Delete</button>
-        </form>
-      </div>
-    {{/if}}
-
-    <p><a href="/songs">Back to songs</a></p>
+    <div class="song-info">
+      <h2 id="songtitle">{{song.title}}</h2>
+      <p><strong>Artist:</strong> {{song.artist_name}}</p>
+      <p><strong>Album:</strong> {{song.album_title}}</p>
+      <p><strong>Duration:</strong> {{song.duration}}</p>
+      {{#if song.track_number}}
+        <p><strong>Track:</strong> {{song.track_number}}</p>
+      {{/if}}
+    </div>
   </div>
+
+  {{#if session.isAdmin}}
+    <div class="admin-tools">
+      <a href="/songs/modify/{{song.sid}}">Modify</a>
+      <form
+        action="/songs/delete/{{song.sid}}"
+        method="POST"
+        style="display:inline"
+      >
+        <button
+          type="submit"
+          onclick="return confirm('Delete {{song.title}}?')"
+        >
+          Delete
+        </button>
+      </form>
+    </div>
+  {{/if}}
+
+  <p><a href="/songs">← Back to songs</a></p>
 </div>
